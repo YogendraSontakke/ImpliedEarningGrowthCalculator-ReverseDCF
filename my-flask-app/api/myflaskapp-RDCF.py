@@ -33,11 +33,14 @@ def index():
     if request.method == 'POST':
         try:
             current_earnings = float(request.form['current_earnings'])
-            discount_rate = float(request.form['discount_rate']) / 100.0            
+            discount_rate = float(request.form['discount_rate'])            
             years = int(request.form['years'])
             terminal_multiple = float(request.form['terminal_multiple'])
             current_valuation = float(request.form['current_valuation'])
-            
+            # Convert discount rate to decimal for calculations
+            if discount_rate != None:
+                discount_rate = discount_rate / 100.0
+
             implied_growth_rate = calculate_implied_growth_rate(current_earnings, discount_rate, terminal_multiple, current_valuation, years)
             
             future_earnings = current_earnings * ((1 + implied_growth_rate) ** years)
@@ -59,10 +62,13 @@ def index():
     else:
         # Retrieve parameters from URL
         current_earnings = request.args.get('current_earnings', type=float)
-        discount_rate = request.args.get('discount_rate', type=float) / 100.0
+        discount_rate = request.args.get('discount_rate', type=float) 
         years = request.args.get('years', type=int)
         terminal_multiple = request.args.get('terminal_multiple', type=float)
         current_valuation = request.args.get('current_valuation', type=float)
+        # Convert discount rate to decimal for calculations
+        if discount_rate != None:
+            discount_rate = discount_rate / 100.0
 
         if all(v is not None for v in [current_earnings, discount_rate, years, terminal_multiple, current_valuation]):
             implied_growth_rate = calculate_implied_growth_rate(current_earnings, discount_rate, terminal_multiple, current_valuation, years)
@@ -153,7 +159,7 @@ TEMPLATE = """
         <h2>Input:</h2>
         <ul class="list-group">
             <li class="list-group-item">Current Earnings: ₹{{ result.current_earnings }}</li>
-            <li class="list-group-item">Discount Rate / Expected Rate of Return: {{ result.discount_rate * 100 }}%</li>
+            <li class="list-group-item">Discount Rate / Expected Rate of Return: {{ result.discount_rate * 100.0 }}%</li>
             <li class="list-group-item">Years: {{ result.years }}</li>
             <li class="list-group-item">Terminal P/E Multiple: {{ result.terminal_multiple }}</li>
             <li class="list-group-item">Current Valuation: ₹{{ result.current_valuation }}</li>
@@ -168,7 +174,7 @@ TEMPLATE = """
         
         <h2 class="mt-4">Summary:</h2>
         <ul class="list-group">
-            <li class="list-group-item">If you purchase the company with a market capitalization of ₹{{ result.current_valuation | round(0)}} crore and earnings of ₹{{ result.current_earnings | round(0)}} crore, expecting a {{ result.discount_rate * 100 }}% annual return over the next {{ result.years }} years, you assume a terminal price-to-earnings multiple of {{ result.terminal_multiple | round(0) }}. This implies that the company’s earnings must grow at an annual rate of {{ (result.implied_growth_rate * 100) | round(2) }}% during this period. Under these conditions, the company's market capitalization would reach approximately ₹{{ result.market_cap | round(0) }} crore, resulting in an absolute return of {{ result.absolute_return | round(2)}}%.</li>
+            <li class="list-group-item">If you purchase the company with a market capitalization of ₹{{ result.current_valuation | round(0)}} crore and earnings of ₹{{ result.current_earnings | round(0)}} crore, expecting a {{ result.discount_rate * 100.0 }}% annual return over the next {{ result.years }} years, you assume a terminal price-to-earnings multiple of {{ result.terminal_multiple | round(0) }}. This implies that the company’s earnings must grow at an annual rate of {{ (result.implied_growth_rate * 100) | round(2) }}% during this period. Under these conditions, the company's market capitalization would reach approximately ₹{{ result.market_cap | round(0) }} crore, resulting in an absolute return of {{ result.absolute_return | round(2)}}%.</li>
         </ul>
 
         <h2 class="mt-4">Share This Link:</h2>
@@ -189,5 +195,5 @@ TEMPLATE = """
 """
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
 
