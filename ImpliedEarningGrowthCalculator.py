@@ -33,7 +33,10 @@ def index():
     if request.method == 'POST':
         try:
             current_earnings = float(request.form['current_earnings'])
-            discount_rate = float(request.form['discount_rate']) / 100.0            
+            discount_rate = float(request.form['discount_rate'])
+            if discount_rate is None:
+                return jsonify({"error": "Discount rate is required"}), 400     
+            discount_rate /= 100.0
             years = int(request.form['years'])
             terminal_multiple = float(request.form['terminal_multiple'])
             current_valuation = float(request.form['current_valuation'])
