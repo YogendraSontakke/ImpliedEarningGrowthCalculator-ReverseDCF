@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/myflaskapp-RDCF.py",
+      "src": "api/app.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/myflaskapp-RDCF.py"
+      "dest": "/api/app.py"
     }
   ]
 }
