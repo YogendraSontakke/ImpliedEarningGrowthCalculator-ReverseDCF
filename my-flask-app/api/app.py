@@ -30,16 +30,29 @@ def calculate_implied_growth_rate(current_earnings, discount_rate, terminal_mult
 def index():
     result = None
     error = None
+    form_data = {
+        'current_earnings': '',
+        'discount_rate': '',
+        'years': '',
+        'terminal_multiple': '',
+        'current_valuation': ''
+    }
+
     if request.method == 'POST':
         try:
             current_earnings = float(request.form['current_earnings'])
-            discount_rate = float(request.form['discount_rate'])            
+            discount_rate = float(request.form['discount_rate']) / 100.0
             years = int(request.form['years'])
             terminal_multiple = float(request.form['terminal_multiple'])
             current_valuation = float(request.form['current_valuation'])
-            # Convert discount rate to decimal for calculations
-            if discount_rate != None:
-                discount_rate = discount_rate / 100.0
+            
+            form_data = {
+                'current_earnings': current_earnings,
+                'discount_rate': discount_rate * 100,
+                'years': years,
+                'terminal_multiple': terminal_multiple,
+                'current_valuation': current_valuation
+            }
 
             implied_growth_rate = calculate_implied_growth_rate(current_earnings, discount_rate, terminal_multiple, current_valuation, years)
             
@@ -54,7 +67,7 @@ def index():
                 'terminal_multiple': terminal_multiple,
                 'current_valuation': current_valuation,
                 'implied_growth_rate': implied_growth_rate,
-                'future_earnings' : future_earnings,
+                'future_earnings': future_earnings,
                 'market_cap': market_cap,
                 'absolute_return': absolute_return
             }
@@ -63,15 +76,21 @@ def index():
     else:
         # Retrieve parameters from URL
         current_earnings = request.args.get('current_earnings', type=float)
-        discount_rate = request.args.get('discount_rate', type=float) 
+        discount_rate = request.args.get('discount_rate', type=float)
         years = request.args.get('years', type=int)
         terminal_multiple = request.args.get('terminal_multiple', type=float)
         current_valuation = request.args.get('current_valuation', type=float)
-        # Convert discount rate to decimal for calculations
-        if discount_rate != None:
-            discount_rate = discount_rate / 100.0
 
         if all(v is not None for v in [current_earnings, discount_rate, years, terminal_multiple, current_valuation]):
+            form_data = {
+                'current_earnings': current_earnings,
+                'discount_rate': discount_rate,
+                'years': years,
+                'terminal_multiple': terminal_multiple,
+                'current_valuation': current_valuation
+            }
+
+            discount_rate /= 100.0
             implied_growth_rate = calculate_implied_growth_rate(current_earnings, discount_rate, terminal_multiple, current_valuation, years)
             
             future_earnings = current_earnings * ((1 + implied_growth_rate) ** years)
@@ -85,12 +104,12 @@ def index():
                 'terminal_multiple': terminal_multiple,
                 'current_valuation': current_valuation,
                 'implied_growth_rate': implied_growth_rate,
-                'future_earnings' : future_earnings,
+                'future_earnings': future_earnings,
                 'market_cap': market_cap,
                 'absolute_return': absolute_return
             }
     
-    return render_template_string(TEMPLATE, result=result, error=error)
+    return render_template_string(TEMPLATE, result=result, error=error, form_data=form_data)
 
 TEMPLATE = """
 <!doctype html>
@@ -129,23 +148,23 @@ TEMPLATE = """
         <form method="post" class="mb-4">
             <div class="form-group">
                 <label for="current_earnings">Current Earnings (₹):</label>
-                <input type="text" class="form-control" id="current_earnings" name="current_earnings" required>
+                <input type="text" class="form-control" id="current_earnings" name="current_earnings" required value="{{ form_data.current_earnings }}">
             </div>
             <div class="form-group">
                 <label for="discount_rate">Discount Rate / Expected Rate of Return (%):</label>
-                <input type="text" class="form-control" id="discount_rate" name="discount_rate" required>
+                <input type="text" class="form-control" id="discount_rate" name="discount_rate" required value="{{ form_data.discount_rate }}">
             </div>
             <div class="form-group">
                 <label for="years">Years:</label>
-                <input type="text" class="form-control" id="years" name="years" required>
+                <input type="text" class="form-control" id="years" name="years" required value="{{ form_data.years }}">
             </div>
             <div class="form-group">
                 <label for="terminal_multiple">Terminal P/E Multiple:</label>
-                <input type="text" class="form-control" id="terminal_multiple" name="terminal_multiple" required>
+                <input type="text" class="form-control" id="terminal_multiple" name="terminal_multiple" required value="{{ form_data.terminal_multiple }}">
             </div>
             <div class="form-group">
                 <label for="current_valuation">Current Valuation (₹):</label>
-                <input type="text" class="form-control" id="current_valuation" name="current_valuation" required>
+                <input type="text" class="form-control" id="current_valuation" name="current_valuation" required value="{{ form_data.current_valuation }}">
             </div>
             <button type="submit" name="calculate" class="btn btn-primary btn-block">Calculate</button>
             <button type="reset" class="btn btn-secondary btn-block">Reset</button>
@@ -199,4 +218,3 @@ TEMPLATE = """
 
 if __name__ == '__main__':
     app.run(debug=False)
-
