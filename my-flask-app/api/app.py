@@ -54,6 +54,7 @@ def index():
                 'terminal_multiple': terminal_multiple,
                 'current_valuation': current_valuation,
                 'implied_growth_rate': implied_growth_rate,
+                'future_earnings' : future_earnings,
                 'market_cap': market_cap,
                 'absolute_return': absolute_return
             }
@@ -84,6 +85,7 @@ def index():
                 'terminal_multiple': terminal_multiple,
                 'current_valuation': current_valuation,
                 'implied_growth_rate': implied_growth_rate,
+                'future_earnings' : future_earnings,
                 'market_cap': market_cap,
                 'absolute_return': absolute_return
             }
@@ -168,13 +170,14 @@ TEMPLATE = """
         <h2 class="mt-4">Result:</h2>
         <ul class="list-group">
             <li class="list-group-item">The implied earning growth rate is {{ (result.implied_growth_rate * 100) | round(2) }}%</li>
-            <li class="list-group-item">Market Capitalization after {{ result.years }} years: ₹{{ result.market_cap | round(0) }}</li>
-            <li class="list-group-item">Absolute Returns after {{ result.years }} years: {{ result.absolute_return | round(2) }}%</li>
+            <li class="list-group-item">The implied earnings after {{ result.years }} years: ₹{{ result.future_earnings | round(0) }}</li>
+            <li class="list-group-item">The implied Market Capitalization after {{ result.years }} years: ₹{{ result.market_cap | round(0) }}</li>
+            <li class="list-group-item">The implied Absolute Returns after {{ result.years }} years: {{ result.absolute_return | round(2) }}%</li>
         </ul>
         
         <h2 class="mt-4">Summary:</h2>
         <ul class="list-group">
-            <li class="list-group-item">If you purchase the company with a market capitalization of ₹{{ result.current_valuation | round(0)}} crore and earnings of ₹{{ result.current_earnings | round(0)}} crore, expecting a {{ result.discount_rate * 100.0 }}% annual return over the next {{ result.years }} years, you assume a terminal price-to-earnings multiple of {{ result.terminal_multiple | round(0) }}. This implies that the company’s earnings must grow at an annual rate of {{ (result.implied_growth_rate * 100) | round(2) }}% during this period. Under these conditions, the company's market capitalization would reach approximately ₹{{ result.market_cap | round(0) }} crore, resulting in an absolute return of {{ result.absolute_return | round(2)}}%.</li>
+            <li class="list-group-item">If you purchase the company with a market capitalization of ₹{{ result.current_valuation | round(0)}} crore and earnings of ₹{{ result.current_earnings | round(0)}} crore, expecting a {{ result.discount_rate * 100.0 }}% annual return over the next {{ result.years }} years, you assume a terminal price-to-earnings multiple of {{ result.terminal_multiple | round(0) }}. This implies that the company’s earnings must grow at an annual rate of {{ (result.implied_growth_rate * 100) | round(2) }}% to ₹{{ result.future_earnings | round(0) }} crore during this period. Under these conditions, the company's market capitalization would reach approximately ₹{{ result.market_cap | round(0) }} crore, resulting in an absolute return of {{ result.absolute_return | round(2)}}%.</li>
         </ul>
 
         <h2 class="mt-4">Share This Link:</h2>
